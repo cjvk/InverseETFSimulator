@@ -5,6 +5,28 @@ import InverseETF
 import HistoricalPrices
 
 def main():
+    allPrices()
+
+
+def allPrices():
+
+    underlying = Underlying.Underlying("SPY")
+    inverseETF = InverseETF.InverseETF(underlying)
+
+    PRICE_LIST_HUGE = HistoricalPrices.SPY['All']
+
+    underlying.setPricelist(PRICE_LIST_HUGE)
+    printItWithTitle(underlying, inverseETF, '1950 to present')
+
+    # what exactly is the research of interest here?
+    # how about bucketizing 5-year blocks?
+    # it should not be rocket science that these things
+    #   A) never lose more than initial principal
+    #   B) do not provide a predictable hedge
+    #   C) lose money in cases of price_a -> price_b -> price_a
+    
+
+def main_old():
     underlying = Underlying.Underlying("SPY")
     inverseETF = InverseETF.InverseETF(underlying)
 
