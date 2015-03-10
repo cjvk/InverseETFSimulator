@@ -5,7 +5,7 @@ import InverseETF
 import HistoricalPrices
 
 def main():
-    allPrices()
+    allPricesByBlocksize(250)
 
 
 def allPrices():
@@ -24,7 +24,44 @@ def allPrices():
     #   A) never lose more than initial principal
     #   B) do not provide a predictable hedge
     #   C) lose money in cases of price_a -> price_b -> price_a
-    
+
+def allPricesByBlocksize(blockSize):
+    underlying = Underlying.Underlying("SPY")
+    inverseETF = InverseETF.InverseETF(underlying)
+
+    PRICE_LIST_HUGE = HistoricalPrices.SPY['All']
+
+    total_slices = len(PRICE_LIST_HUGE) / blockSize
+
+    whoWon = {
+        'iETF'     : 0,
+        'short'    : 0,
+        'tie'      : 0,
+        }
+
+    for slice in range(0, total_slices):
+        offset = slice * blockSize
+        sublist = PRICE_LIST_HUGE[offset:offset+blockSize]
+        underlying.setPricelist(sublist)
+
+        shortPnl = underlying.shortPnl()
+        pnl = inverseETF.pnl()
+        shortYield = underlying.shortPercentageYield()
+        ietfyield = inverseETF.percentageYield()
+
+        if shortPnl > pnl:
+            whoWon['short'] = whoWon['short'] + 1
+        elif pnl > shortPnl:
+            whoWon['iETF'] = whoWon['iETF'] + 1
+        else:
+            whoWon['tie'] = whoWon['tie'] + 1
+
+    print "--------", "blocksize=" + str(blockSize), "--------"
+    print "trials:", total_slices
+    print "short wins:", whoWon['short']
+    print "iETF wins:", whoWon['iETF']
+    print "tie:", whoWon['tie']
+
 
 def main_old():
     underlying = Underlying.Underlying("SPY")
